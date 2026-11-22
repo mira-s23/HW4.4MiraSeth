@@ -1,28 +1,57 @@
-# Project Title
+# STAT 184 HW 4.3
 
-Write a 1-2 sentences that quickly and clearly convey what your repo is for.
+This repository contains my work for HW 4.3. It includes my R code, data analysis, graphs, and final assignment PDF.
 
 ## Overview
 
-Expand on those introductory sentences with a brief but informative description of your project's purpose and goals. This section should help visitors decide whether they should dig deeper into your repo/project.
+I used R to work with different datasets and practice organizing data, calculating statistics, and making graphs.
 
-### Interesting Insight (Optional)
+The assignment includes:
 
-This is optional but highly recommended. You'll include one interesting insight from your project as part of the README. This insight is most effective when you include a visual. Keep in mind that this visual must be included as an image file (e.g., JPG, PNG, etc.). You can export plots created with `{ggplot2}` by using the function `ggsave`.
+Diamonds data: Tables showing length, width, and depth statistics
+
+Big Ten Women's Basketball: Looking at basketball data and comparing teams
+
+Monte Carlo: A simulation using the points (2,2) 
+
+Calcium data: Comparing calcium measurements between the null treatment group and the diet and exercise group.
+
 
 ## Data Sources and Acknowledgements
 
-Be sure to list where you got any data used within the project. Be sure to acknowledge any one whose work or elements you're drawing upon.
+Diamonds: The built-in diamonds dataset from the ggplot2 package
+
+Big Ten Women's Basketball: Dataset files provided for the assignment
+
+Calcium: The calcium.csv file provided for the assignment
+
+Monte Carlo: Points provided in R for the simulation.
+
+I used R and packages like tidyverse and ggplot2 to complete the analysis
+I would also like to acknowledge my STAT 184 professor for providing all the datasets, files, assignment instructions, and resources used throughout this project.
 
 ## Current Plan
 
-Provide some information about what you intend to doe with the project. You can additionally refer the visitor to your detailed plan document.
+My plan is to use this repository to organize my HW 4.3 work and keep track of my progress. I will use GitHub branches, issues, commits, and pull requests to manage changes.
+
+The project includes the completed analysis, final PDF, and QMD file. My detailed plan is available in project-plan.md.
 
 ## Repo Structure
 
-Use this section to explain the structure of your repo. This should help visitors quickly figure out where they should look to find certain elements. Further, you can use this space to highlight and briefly explain important/key files in the repo.
+README.md – Overview of the project and repository
+
+project-plan.md – Plan for managing the repository and completing the assignment
+
+.qmd file – Quarto document containing the analysis and code
+
+.pdf file – Final rendered version of the assignment
+
+images/ – Folder for project images and visualizations
+
+optional_files/ – Folder for any additional files
 
 
 ## Authors
 
-Give information about who are the authors of the project and how people can get in touch if they have questions.
+Mira Seth
+GitHub: @mira-s23
