@@ -1,0 +1,662 @@
+---
+
+---
+title: "HW 4.3: Reproducible Data Analysis"
+author: "Mira Seth"
+date: "November 18, 2026"
+format: typst
+editor: source
+---
+
+---
+
+\# Introduction
+
+\# Diamonds Descriptive Statistics
+
+\## Length
+
+```{{r}}
+library(tidyverse)
+data(diamonds)
+
+newDiamonds <- diamonds |>
+  filter(x != 0, y != 0, z != 0) |>
+  select(color, x, y, z)
+
+# Calculate length statistics by color
+length_table <- newDiamonds |>
+  group_by(color) |>
+  summarise(
+    Frequency = n(),
+    `0%` = quantile(x, 0),
+    `20%` = quantile(x, 0.20),
+    `40%` = quantile(x, 0.40),
+    `60%` = quantile(x, 0.60),
+    `80%` = quantile(x, 0.80),
+    `100%` = quantile(x, 1),
+    Median = median(x),
+    Mean = mean(x),
+    `Sample SD` = sd(x),
+    .groups = "drop"
+  )
+
+knitr::kable(
+  length_table,
+  digits = 4,
+  caption = "Descriptive Statistics for Diamond Length by Color"
+)
+```
+
+\## Width
+
+```{{r}}
+width_table <- newDiamonds |>
+  group_by(color) |>
+  summarise(
+    Frequency = n(),
+    `0%` = quantile(y, 0),
+    `20%` = quantile(y, 0.20),
+    `40%` = quantile(y, 0.40),
+    `60%` = quantile(y, 0.60),
+    `80%` = quantile(y, 0.80),
+    `100%` = quantile(y, 1),
+    Median = median(y),
+    Mean = mean(y),
+    `Sample SD` = sd(y),
+    .groups = "drop"
+  )
+
+knitr::kable(
+  width_table,
+  digits = 4,
+  caption = "Descriptive Statistics for Diamond Width by Color"
+)
+```
+
+\## Depth
+
+```{{r}}
+depth_table <- newDiamonds |>
+  group_by(color) |>
+  summarise(
+    Frequency = n(),
+    `0%` = quantile(z, 0),
+    `20%` = quantile(z, 0.20),
+    `40%` = quantile(z, 0.40),
+    `60%` = quantile(z, 0.60),
+    `80%` = quantile(z, 0.80),
+    `100%` = quantile(z, 1),
+    Median = median(z),
+    Mean = mean(z),
+    `Sample SD` = sd(z),
+    .groups = "drop"
+  )
+
+knitr::kable(
+  depth_table,
+  digits = 4,
+  caption = "Descriptive Statistics for Diamond Depth by Color"
+)
+```
+
+\# Big Ten Academic Alliance
+
+```{{r}}
+
+library(tidyverse)
+library(ggplot2)
+
+# Import the datasets
+teams <- read_csv("~/Downloads/teams.csv")
+team_box <- read_csv("~/Downloads/team_box (1).csv")
+
+# Identify Big Ten teams
+big_ten <- teams |>
+  filter(conference_name == "Big Ten Conference")
+
+# Calculate average points for each Big Ten team
+team_averages <- team_box |>
+  filter(team_id %in% big_ten$team_id) |>
+  group_by(team_display_name) |>
+  summarise(
+    average_points = mean(team_score, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Create the visualization
+ggplot(
+  team_averages,
+  aes(
+    x = reorder(team_display_name, average_points),
+    y = average_points
+  )
+) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Average Points Scored by Big Ten Women's Basketball Teams",
+    x = "Team",
+    y = "Average Points per Game",
+    caption = "Source: Big Ten women's basketball team statistics"
+  ) +
+  theme_minimal()
+```
+
+\# Monte Carlo Numerical Integration
+
+```{{r}}
+library(ggplot2)
+library(dplyr)
+
+# Function to generate random points
+monte_carlo <- function(n, x_min, x_max, y_min, y_max) {
+  x <- runif(n, min = x_min, max = x_max)
+  y <- runif(n, min = y_min, max = y_max)
+  data.frame(x = x, y = y)
+}
+
+# Assigned function: Beta(2, 2) density
+# Exact integral from 0 to 1 is 1
+
+# Create plots using different numbers of random points
+make_mc_plot <- function(n) {
+  points <- monte_carlo(n, 0, 1, 0, 1.5)
+
+  points$flag <- ifelse(
+    points$y > dbeta(points$x, shape1 = 2, shape2 = 2),
+    "above",
+    "on/below"
+  )
+
+  p <- mean(points$flag == "on/below")
+  estimate <- p * 1.5
+
+  ggplot(points, aes(x = x, y = y, color = flag)) +
+    geom_point(alpha = 0.5, size = 0.7) +
+    stat_function(
+      fun = dbeta,
+      args = list(shape1 = 2, shape2 = 2),
+      color = "blue",
+      linewidth = 1
+    ) +
+    scale_color_manual(
+      values = c("above" = "red", "on/below" = "green")
+    ) +
+    coord_cartesian(xlim = c(0, 1), ylim = c(0, 1.5)) +
+    labs(
+      title = paste("n =", n, "| Estimate =", round(estimate, 4)),
+      x = "x",
+      y = "y",
+      color = "Point Location"
+    ) +
+    theme_minimal()
+}
+
+# Four simulation sizes
+make_mc_plot(100)
+make_mc_plot(500)
+make_mc_plot(1000)
+make_mc_plot(5000)
+
+\# Planning and Prompting GenAI Tools
+
+\## My Plan
+
+I plan to compare how ulna calcium measurements changed over the four years for the null treatment group and the diet and exercise group. Since the data is currently separated into different columns for each group and year, I will first organize it into a longer format. I will include variables for the group, year, and calcium measurement. I will then create a line graph showing the average calcium measurements over time for both groups. I will also check for missing values before analyzing the data.
+
+\## Plan-Informed GenAI Response
+
+Based on your plan, I would first convert the calcium dataset from wide format into long format so that each observation has a group, year, and calcium measurement. This will make it easier to compare the null treatment group with the diet and exercise group.
+
+I would then check for missing values and keep them as `NA` rather than replacing them with zero. When calculating the average calcium measurements for each group and year, I would use `na.rm = TRUE` to exclude missing values.
+
+Finally, I would create a line graph with year on the x-axis, average calcium measurements on the y-axis, and separate lines for each group. This would make it easier to see how the measurements changed over the four years and compare the patterns between the groups.
+
+\## Generic GenAI Response
+
+I would first examine the calcium dataset and organize it into a long format so that each row represents one participant's calcium measurement at a specific time point. I would identify the treatment group and measurement year for each value, making it easier to compare the two groups.
+
+Next, I would check for missing values and leave them as `NA` rather than replacing them with zero. I would use `na.rm = TRUE` when calculating the averages so that missing values are excluded from the calculations.
+
+I would then calculate the average ulna calcium measurement for each group at each time point. Finally, I would create a line graph with the measurement year on the x-axis, average calcium measurement on the y-axis, and a separate line for each treatment group.
+
+A line graph would be useful because it shows how the average measurements change over time and makes it easier to compare the null treatment group with the diet and exercise group.
+
+\## Comparison
+
+The plan informed response followed the steps I originally wanted to take, while the generic response came up with its own approach. Both responses organized the data and suggested a line graph to compare the groups. This showed me that giving GenAI a plan can help it produce results that better match what I am looking for.
+
+\# Self-Reflection
+
+This assignment helped me get more comfortable using R to organize data, calculate statistics, and create visualizations. I learned that cleaning and organizing data is an important step before analyzing it. I also learned that GenAI can be helpful when working through code, but I still need to check the results and understand what the code does. In the future, I would spend more time planning before starting my analysis.
+
+\# Appendix A: GenAI Usage
+
+Tool: ChatGPT
+
+Model: GPT-6
+
+Date Used: November 19 2026
+
+Generic prompt: Look at the original calcium.csv dataset and help me organize the data and create a graph comparing the average ulna calcium measurements for the null treatment group and the diet and exercise group over the four years. Explain how you organized the data, how you handled missing values, and include the R code you used.
+
+Plan-informed prompt: Using the plan I wrote above and the original calcium.csv dataset, help me organize the data and make a graph comparing the average ulna calcium measurements for the null treatment group and the diet and exercise group over the four years. Explain how you organized the data, what you did with missing values, and include the R code you used.
+
+\# Appendix B: Code
+
+Diamonds Challenge:
+
+```         
+
+#Load packages and data
+library(tidyverse)
+data(diamonds)
+
+#Remove diamonds with zero dimensions
+newDiamonds <- diamonds |>
+  filter(x != 0, y != 0, z != 0) |>
+  select(cut, x, y, z)
+
+#Put x, y, and z into one column
+diamondsLong <- newDiamonds |>
+  pivot_longer(
+    cols = x:z,
+    names_to = "Dimension",
+    values_to = "Value"
+  )
+
+#Calculate statistics for each cut and dimension
+statVals <- diamondsLong |>
+  group_by(cut, Dimension) |>
+  summarise(
+    Count = length(Value),
+    Min = min(Value),
+    Q1 = quantile(Value, 0.25),
+    Median = median(Value),
+    Q3 = quantile(Value, 0.75),
+    Max = max(Value),
+    MAD = mad(Value),
+    Mean = mean(Value),
+    SD = sd(Value),
+    .groups = "drop"
+  )
+
+#View the results
+statVals
+```
+
+Diamonds Table of Descriptive Statistics:
+
+```         
+# Step 1: Load Packages and Data ----
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+data(diamonds)
+
+# Step 2: Select the Needed Data ----
+diamondsDepth <- diamonds |>
+  select(color, z)
+
+# Step 3: Calculate Descriptive Statistics ----
+diamondsStats <- diamondsDepth |>
+  group_by(color) |>
+  summarize(
+    Count = n(),
+    Min = min(z),
+    Q1 = quantile(z, probs = 0.25),
+    Q2 = quantile(z, probs = 0.50),
+    Median = median(z),
+    Q3 = quantile(z, probs = 0.75),
+    Q4 = quantile(z, probs = 1),
+    Max = max(z),
+    Mean = mean(z),
+    SD = sd(z),
+    .groups = "drop"
+  )
+
+# Step 4: Format the Table ----
+diamondsTable <- diamondsStats |>
+  rename(
+    Color = color,
+    `Sample Minimum` = Min,
+    `First Quartile` = Q1,
+    `Second Quartile` = Q2,
+    `Sample Median` = Median,
+    `Third Quartile` = Q3,
+    `Fourth Quartile` = Q4,
+    `Sample Maximum` = Max,
+    `Sample Arithmetic Mean` = Mean,
+    `Sample Arithmetic Standard Deviation` = SD
+  ) |>
+  mutate(
+    across(
+      where(is.numeric) & !any_of("Count"),
+      \(x) round(x, 2)
+    )
+  )
+
+# Step 5: Display the Final Table ----
+diamondsTable |>
+  kable(
+    caption = "Descriptive Statistics for Diamond Depth by Color",
+    digits = 2
+  ) |>
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed"),
+    full_width = FALSE
+  )
+```
+
+Big Ten Academic Alliance
+
+```         
+# Big Ten Women's Basketball Data Wrangling
+
+# Load packages
+library(readr)
+library(dplyr)
+
+# Import datasets
+teams <- read_csv(
+  "teams.csv",
+  show_col_types = FALSE
+)
+
+games <- read_csv(
+  "games.csv",
+  show_col_types = FALSE
+)
+
+rankings <- read_csv(
+  "rankings.csv",
+  show_col_types = FALSE
+)
+
+team_box <- read_csv(
+  "team_box.csv",
+  show_col_types = FALSE
+)
+
+# Extract and import player box scores
+zip_file <- "game_box (1)-compressed.zip"
+
+player_file <- "game_box.csv"
+
+extract_folder <- tempdir()
+
+unzip(
+  zip_file,
+  files = player_file,
+  exdir = extract_folder,
+  overwrite = TRUE
+)
+
+player_box <- read_csv(
+  file.path(extract_folder, player_file),
+  show_col_types = FALSE
+)
+
+# Identify Big Ten teams
+big_ten_teams <- teams |>
+  filter(conference_name == "Big Ten Conference") |>
+  distinct(team_id, .keep_all = TRUE) |>
+  select(
+    team_id,
+    team,
+    display_name,
+    abbreviation,
+    conference_name,
+    conference_short_name
+  )
+
+# Create a list of Big Ten team IDs
+big_ten_team_ids <- big_ten_teams$team_id
+
+# Filter games involving at least one Big Ten team
+big_ten_games <- games |>
+  filter(
+    home_id %in% big_ten_team_ids |
+      away_id %in% big_ten_team_ids
+  )
+
+# Filter team box scores to Big Ten teams
+big_ten_team_box <- team_box |>
+  filter(team_id %in% big_ten_team_ids) |>
+  left_join(
+    big_ten_teams |>
+      select(
+        team_id,
+        conference_name,
+        conference_short_name
+      ),
+    by = "team_id"
+  )
+
+# Filter player box scores to Big Ten teams
+big_ten_player_box <- player_box |>
+  filter(team_id %in% big_ten_team_ids) |>
+  left_join(
+    big_ten_teams |>
+      select(
+        team_id,
+        conference_name,
+        conference_short_name
+      ),
+    by = "team_id"
+  )
+
+# Filter rankings to Big Ten teams
+big_ten_rankings <- rankings |>
+  filter(team_id %in% big_ten_team_ids) |>
+  left_join(
+    big_ten_teams |>
+      select(
+        team_id,
+        conference_name,
+        conference_short_name
+      ),
+    by = "team_id"
+  )
+```
+
+Points Visualization:
+
+```         
+library(readr)
+library(dplyr)
+library(ggplot2)
+
+teams <- read_csv("~/Downloads/teams.csv")
+team_box <- read_csv("~/Downloads/team_box (1).csv")
+
+big_ten <- teams %>%
+  filter(conference_name == "Big Ten Conference")
+
+team_averages <- team_box %>%
+  filter(team_id %in% big_ten$team_id) %>%
+  group_by(team_display_name) %>%
+  summarise(average_points = mean(team_score, na.rm = TRUE))
+
+ggplot(team_averages, aes(x = reorder(team_display_name, average_points),
+                          y = average_points)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Average Points Scored by Big Ten Women's Basketball Teams",
+    x = "Team",
+    y = "Average Points per Game"
+  ) +
+  theme_minimal()
+```
+
+Monte Carlo Numerical integration:
+
+```         
+library(ggplot2) 
+
+# Function to generate random coordinates
+monte_carlo <- function(n, x_min, x_max, y_min, y_max) {
+  
+  x <- runif(n, min = x_min, max = x_max)
+  y <- runif(n, min = y_min, max = y_max)
+  
+  data.frame(x = x, y = y)
+}
+
+# Define the function
+f <- function(x) {
+  -(x - 4)^2 + 4
+}
+
+# Define sample sizes
+sample_sizes <- c(10, 100, 1000, 10000)
+
+# Generate points and classify them
+results <- lapply(sample_sizes, function(n) {
+  
+  points <- monte_carlo(n, 2, 6, 0, 4)
+  
+  points$flag <- ifelse(points$y > f(points$x),
+                        "above", "on/below")
+  
+  # Calculate the estimated integral
+  p <- mean(points$flag == "on/below")
+  estimate <- p * 16
+  
+  points$n <- n
+  points$estimate <- estimate
+  points$plot_label <- paste0(
+    "n = ", n, "\nEstimate = ", round(estimate, 4)
+  )
+  
+  points
+})
+
+# Combine all results
+all_points <- do.call(rbind, results)
+
+# Create the four small multiple plots
+ggplot(all_points, aes(x = x, y = y, color = flag)) +
+  geom_point(size = 1, alpha = 0.7) +
+  geom_function(fun = f, color = "blue", linewidth = 1) +
+  facet_wrap(~plot_label, ncol = 2) +
+  scale_color_manual(
+    values = c("above" = "red", "on/below" = "green")
+  ) +
+  coord_cartesian(xlim = c(2, 6), ylim = c(0, 4)) +
+  labs(
+    title = "Monte Carlo Integration Example",
+    x = "x",
+    y = "y",
+    color = "flag"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+  
+  library(ggplot2)
+
+# Generate 1000 random points
+points <- monte_carlo(1000, 0, 1, 0, 1.5)
+
+# Classify points as above or on/below the function
+points$flag <- ifelse(
+  points$y > dbeta(points$x, shape1 = 2, shape2 = 2),
+  "above",
+  "on/below"
+)
+
+# Calculate the estimated integral
+p <- mean(points$flag == "on/below")
+estimate <- p * 1.5
+
+# Create the plot
+ggplot(points, aes(x = x, y = y, color = flag)) +
+  geom_point(alpha = 0.6) +
+  stat_function(
+    fun = dbeta,
+    args = list(shape1 = 2, shape2 = 2),
+    xlim = c(0, 1),
+    color = "blue",
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c("above" = "red", "on/below" = "green")
+  ) +
+  labs(
+    title = paste("Monte Carlo Integration, Estimate =", round(estimate, 4)),
+    x = "x",
+    y = "y",
+    color = "Point Location"
+  ) +
+  coord_cartesian(xlim = c(0, 1), ylim = c(0, 1.5)) +
+  theme_minimal()
+
+# Display estimated integral
+estimate
+```
+
+Calcium Dataset:
+
+```         
+library(tidyverse)
+
+# Import calcium dataset
+calcium <- read_csv("calcium.csv", show_col_types = FALSE)
+
+# Rename columns
+names(calcium) <- c(
+  "null_y0", "null_y1", "null_y2", "null_y3",
+  "diet_y0", "diet_y1", "diet_y2", "diet_y3"
+)
+
+# Convert data from wide format to long format
+calcium_long <- calcium |>
+  mutate(participant = row_number()) |>
+  pivot_longer(
+    cols = -participant,
+    names_to = c("group", "year"),
+    names_pattern = "(null|diet)_y(\\d)",
+    values_to = "calcium"
+  ) |>
+  mutate(
+    group = recode(
+      group,
+      "null" = "Null Treatment",
+      "diet" = "Diet and Exercise"
+    ),
+    year = as.integer(year)
+  )
+
+# Check for missing values
+sum(is.na(calcium_long$calcium))
+
+# Calculate average calcium measurements
+calcium_summary <- calcium_long |>
+  group_by(group, year) |>
+  summarise(
+    average_calcium = mean(calcium, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Create line graph
+ggplot(
+  calcium_summary,
+  aes(x = year, y = average_calcium, color = group, group = group)
+) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(
+    breaks = 0:3,
+    labels = c("Initial", "Year 1", "Year 2", "Year 3")
+  ) +
+  labs(
+    title = "Changes in Ulna Calcium Measurements Over Four Years",
+    x = "Measurement Year",
+    y = "Average Ulna Calcium",
+    color = "Treatment Group"
+  ) +
+  theme_minimal()
+```
